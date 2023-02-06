@@ -16,12 +16,8 @@ resources:
         DBSubnetGroupName:
           Ref: NeptuneDBSubnetGroup
         VpcSecurityGroupIds:
-          - Fn::GetAtt:
-            - "NeptuneVPC"
-            - "DefaultSecurityGroup"
-          - Fn::GetAtt:
-            - "NeptuneServiceSecurityGroup"
-            - "GroupId"
+          - !GetAtt NeptuneVPC.DefaultSecurityGroup
+          - !GetAtt NeptuneServiceSecurityGroup.GroupId          
         Port: 8182
         IamAuthEnabled: false # make this true if using this for anything real, 
                               # you will then need to sign requests
@@ -33,7 +29,7 @@ resources:
       Properties:
         DBClusterIdentifier:
           Ref: "NeptuneDBCluster"
-        DBInstanceClass: "db.r4.xlarge"
+        DBInstanceClass: "db.r5.xlarge"
       DependsOn:
         - "NeptuneDBCluster"
 

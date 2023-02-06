@@ -16,12 +16,8 @@ resources:
         DBSubnetGroupName:
           Ref: NeptuneDBSubnetGroup
         VpcSecurityGroupIds:
-          - Fn::GetAtt:
-            - "NeptuneVPC"
-            - "DefaultSecurityGroup"
-          - Fn::GetAtt:
-            - "NeptuneServiceSecurityGroup"
-            - "GroupId"
+          - !GetAtt NeptuneVPC.DefaultSecurityGroup
+          - !GetAtt NeptuneServiceSecurityGroup.GroupId
         Port: 8182
         IamAuthEnabled: false # make this true if using this for anything real, you will then need to sign requests
       DependsOn:
@@ -32,7 +28,7 @@ resources:
       Properties:
         DBClusterIdentifier:
           Ref: "NeptuneDBCluster"
-        DBInstanceClass: "db.r4.xlarge"
+        DBInstanceClass: "db.r5.xlarge"
       DependsOn:
         - "NeptuneDBCluster"
 
@@ -43,8 +39,8 @@ resources:
       Type: AWS::EC2::VPC
       Properties:
           CidrBlock: 10.0.0.0/16
-          EnableDnsSupport: 'true'
-          EnableDnsHostnames: 'true'
+          EnableDnsSupport: true
+          EnableDnsHostnames: true
           InstanceTenancy: 'default'
           Tags:
             - Key: Name
@@ -83,11 +79,9 @@ resources:
       Properties:
         DBSubnetGroupDescription: "Neptune DB subnet group"
         SubnetIds: 
-          - 
-            Ref: Subnet1
-          - 
-            Ref: Subnet2
-      
+          - !Ref Subnet1            
+          - !Ref Subnet2
+            
     # Setup connectivity by creating an internet gateway
     InternetGateway:
       Type: AWS::EC2::InternetGateway
@@ -153,12 +147,12 @@ resources:
           Ref: NeptuneVPC
         SecurityGroupIngress:
           - IpProtocol: tcp
-            FromPort: '443'
-            ToPort: '443'
+            FromPort: 443
+            ToPort: 443
             CidrIp: 0.0.0.0/0
           - IpProtocol: tcp
-            FromPort: '8182'
-            ToPort: '8182'
+            FromPort: 8182
+            ToPort: 8182
             CidrIp: 0.0.0.0/0
         Tags:
           - Key: Name
@@ -198,11 +192,7 @@ resources:
       Properties:
         RouteTableIds:
           - !Ref SubnetRouteTable
-        ServiceName: !Join 
-          - ''
-          - - com.amazonaws.
-            - !Ref 'AWS::Region'
-            - .s3
+        ServiceName: !Sub "com.amazonaws.${AWS::Region}.s3"
         VpcId: !Ref NeptuneVPC
         PolicyDocument:
           Version: '2012-10-17'
