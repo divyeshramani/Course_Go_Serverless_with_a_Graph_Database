@@ -20,6 +20,9 @@ Query code:
 const __ = gremlin.process.statics;
 const p = gremlin.process.P;
 
+const params = event.queryStringParameters;
+const threshold = parseFloat(params.threshold);
+const hops = parseInt(params.hops);
 // replace query
 gR.V().has("imageId", params.imageId)
         .emit()
